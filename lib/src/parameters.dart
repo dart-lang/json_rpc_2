@@ -19,6 +19,8 @@ import 'exception.dart';
 ///       return params["minuend"].asNum - params["subtrahend"].asNum;
 ///     });
 class Parameters {
+  final _value;
+
   /// The name of the method that this request called.
   final String method;
 
@@ -26,9 +28,9 @@ class Parameters {
   ///
   /// If this is accessed for a [Parameter] that was not passed, the request
   /// will be automatically rejected. To avoid this, use [Parameter.valueOr].
-  final value;
+  get value => _value;
 
-  Parameters(this.method, this.value);
+  Parameters(this.method, this._value);
 
   /// Returns a single parameter.
   ///
@@ -141,15 +143,16 @@ class Parameter extends Parameters {
       }
 
       var path = computePath(params._parent);
-      return params._key is int ?
-          "$path[${params._key}]" : "$path.${quoteKey(params._key)}";
+      return params._key is int
+          ? "$path[${params._key}]"
+          : "$path.${quoteKey(params._key)}";
     }
 
     return computePath(this);
   }
 
   /// Whether this parameter exists.
-  final exists = true;
+  bool get exists => true;
 
   Parameter._(String method, value, this._parent, this._key)
       : super(method, value);
@@ -302,12 +305,14 @@ class Parameter extends Parameters {
 
 /// A subclass of [Parameter] representing a missing parameter.
 class _MissingParameter extends Parameter {
+  @override
   get value {
     throw new RpcException.invalidParams('Request for method "$method" is '
         'missing required parameter $_path.');
   }
 
-  final exists = false;
+  @override
+  bool get exists => false;
 
   _MissingParameter(String method, Parameters parent, key)
       : super._(method, null, parent, key);
