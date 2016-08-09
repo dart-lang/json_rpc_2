@@ -19,8 +19,6 @@ import 'exception.dart';
 ///       return params["minuend"].asNum - params["subtrahend"].asNum;
 ///     });
 class Parameters {
-  final _value;
-
   /// The name of the method that this request called.
   final String method;
 
@@ -28,6 +26,7 @@ class Parameters {
   ///
   /// If this is accessed for a [Parameter] that was not passed, the request
   /// will be automatically rejected. To avoid this, use [Parameter.valueOr].
+  final _value;
   get value => _value;
 
   Parameters(this.method, this._value);
