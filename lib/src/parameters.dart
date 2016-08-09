@@ -304,13 +304,11 @@ class Parameter extends Parameters {
 
 /// A subclass of [Parameter] representing a missing parameter.
 class _MissingParameter extends Parameter {
-  @override
   get value {
     throw new RpcException.invalidParams('Request for method "$method" is '
         'missing required parameter $_path.');
   }
 
-  @override
   bool get exists => false;
 
   _MissingParameter(String method, Parameters parent, key)
