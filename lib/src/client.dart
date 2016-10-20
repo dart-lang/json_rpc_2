@@ -50,7 +50,7 @@ class Client {
   /// [Client.listen] is called.
   Client(StreamChannel<String> channel)
       : this.withoutJson(channel
-            .transform(jsonDocument as StreamChannelTransformer<String, String>)
+            .transform(jsonDocument)
             .transformStream(ignoreFormatExceptions));
 
   /// Creates a [Client] that communicates using decoded messages over

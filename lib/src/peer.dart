@@ -45,7 +45,7 @@ class Peer implements Client, Server {
   /// is called.
   Peer(StreamChannel<String> channel)
       : this.withoutJson(channel
-            .transform(jsonDocument as StreamChannelTransformer<String, String>)
+            .transform(jsonDocument)
             .transform(respondToFormatExceptions));
 
   /// Creates a [Peer] that communicates using decoded messages over [channel].

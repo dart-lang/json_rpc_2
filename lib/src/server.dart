@@ -57,7 +57,7 @@ class Server {
   /// [Server.listen] is called.
   Server(StreamChannel<String> channel)
       : this.withoutJson(channel
-            .transform(jsonDocument as StreamChannelTransformer<String, String>)
+            .transform(jsonDocument)
             .transform(respondToFormatExceptions));
 
   /// Creates a [Server] that communicates using decoded messages over
