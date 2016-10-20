@@ -57,7 +57,7 @@ class Server {
   /// [Server.listen] is called.
   Server(StreamChannel<String> channel)
       : this.withoutJson(channel
-            .transform(jsonDocument)
+            .transform(jsonDocument as StreamChannelTransformer<String, String>)
             .transform(respondToFormatExceptions));
 
   /// Creates a [Server] that communicates using decoded messages over
@@ -126,19 +126,20 @@ class Server {
   /// errors by throwing an [RpcException].
   Future _handleRequest(request) async {
     var response;
-    if (request is! List) {
+    if (request is List) {
+      if (request.isEmpty) {
+        response = new RpcException(error_code.INVALID_REQUEST,
+                'A batch must contain at least one request.')
+            .serialize(request);
+      } else {
+        var results = await Future.wait(request.map(_handleSingleRequest));
+        var nonNull = results.where((result) => result != null);
+        if (nonNull.isEmpty) return;
+        response = nonNull.toList();
+      }
+    } else {
       response = await _handleSingleRequest(request);
       if (response == null) return;
-    } else if (request.isEmpty) {
-      response = new RpcException(
-              error_code.INVALID_REQUEST,
-              'A batch must contain at least one request.')
-          .serialize(request);
-    } else {
-      var results = await Future.wait(request.map(_handleSingleRequest));
-      var nonNull = results.where((result) => result != null);
-      if (nonNull.isEmpty) return;
-      response = nonNull.toList();
     }
 
     if (!isClosed) _manager.add(response);
@@ -146,7 +147,7 @@ class Server {
 
   /// Handles an individual parsed request.
   Future _handleSingleRequest(request) {
-    return syncFuture(() {
+    return new Future.sync(() {
       _validateRequest(request);
 
       var name = request['method'];
@@ -165,11 +166,7 @@ class Server {
       // response, even if one is generated on the server.
       if (!request.containsKey('id')) return null;
 
-      return {
-        'jsonrpc': '2.0',
-        'result': result,
-        'id': request['id']
-      };
+      return {'jsonrpc': '2.0', 'result': result, 'id': request['id']};
     }).catchError((error, stackTrace) {
       if (error is! RpcException) {
         error = new RpcException(
@@ -191,40 +188,54 @@ class Server {
   /// Validates that [request] matches the JSON-RPC spec.
   void _validateRequest(request) {
     if (request is! Map) {
-      throw new RpcException(error_code.INVALID_REQUEST, 'Request must be '
+      throw new RpcException(
+          error_code.INVALID_REQUEST,
+          'Request must be '
           'an Array or an Object.');
     }
 
     if (!request.containsKey('jsonrpc')) {
-      throw new RpcException(error_code.INVALID_REQUEST, 'Request must '
+      throw new RpcException(
+          error_code.INVALID_REQUEST,
+          'Request must '
           'contain a "jsonrpc" key.');
     }
 
     if (request['jsonrpc'] != '2.0') {
-      throw new RpcException(error_code.INVALID_REQUEST, 'Invalid JSON-RPC '
+      throw new RpcException(
+          error_code.INVALID_REQUEST,
+          'Invalid JSON-RPC '
           'version ${JSON.encode(request['jsonrpc'])}, expected "2.0".');
     }
 
     if (!request.containsKey('method')) {
-      throw new RpcException(error_code.INVALID_REQUEST, 'Request must '
+      throw new RpcException(
+          error_code.INVALID_REQUEST,
+          'Request must '
           'contain a "method" key.');
     }
 
     var method = request['method'];
     if (request['method'] is! String) {
-      throw new RpcException(error_code.INVALID_REQUEST, 'Request method must '
+      throw new RpcException(
+          error_code.INVALID_REQUEST,
+          'Request method must '
           'be a string, but was ${JSON.encode(method)}.');
     }
 
     var params = request['params'];
     if (request.containsKey('params') && params is! List && params is! Map) {
-      throw new RpcException(error_code.INVALID_REQUEST, 'Request params must '
+      throw new RpcException(
+          error_code.INVALID_REQUEST,
+          'Request params must '
           'be an Array or an Object, but was ${JSON.encode(params)}.');
     }
 
     var id = request['id'];
     if (id != null && id is! String && id is! num) {
-      throw new RpcException(error_code.INVALID_REQUEST, 'Request id must be a '
+      throw new RpcException(
+          error_code.INVALID_REQUEST,
+          'Request id must be a '
           'string, number, or null, but was ${JSON.encode(id)}.');
     }
   }
@@ -235,12 +246,12 @@ class Server {
 
     _tryNext() {
       if (!iterator.moveNext()) {
-        return new Future.error(
-            new RpcException.methodNotFound(params.method),
+        return new Future.error(new RpcException.methodNotFound(params.method),
             new Chain.current());
       }
 
-      return syncFuture(() => iterator.current(params)).catchError((error) {
+      return new Future.sync(() => iterator.current(params))
+          .catchError((error) {
         if (error is! RpcException) throw error;
         if (error.code != error_code.METHOD_NOT_FOUND) throw error;
         return _tryNext();

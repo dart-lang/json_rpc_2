@@ -45,7 +45,7 @@ class Peer implements Client, Server {
   /// is called.
   Peer(StreamChannel<String> channel)
       : this.withoutJson(channel
-            .transform(jsonDocument)
+            .transform(jsonDocument as StreamChannelTransformer<String, String>)
             .transform(respondToFormatExceptions));
 
   /// Creates a [Peer] that communicates using decoded messages over [channel].
@@ -57,10 +57,10 @@ class Peer implements Client, Server {
   /// [Peer.listen] is called.
   Peer.withoutJson(StreamChannel channel)
       : _manager = new ChannelManager("Peer", channel) {
-    _server = new Server.withoutJson(new StreamChannel(
-        _serverIncomingForwarder.stream, channel.sink));
-    _client = new Client.withoutJson(new StreamChannel(
-        _clientIncomingForwarder.stream, channel.sink));
+    _server = new Server.withoutJson(
+        new StreamChannel(_serverIncomingForwarder.stream, channel.sink));
+    _client = new Client.withoutJson(
+        new StreamChannel(_clientIncomingForwarder.stream, channel.sink));
   }
 
   // Client methods.
@@ -93,8 +93,9 @@ class Peer implements Client, Server {
         } else {
           _serverIncomingForwarder.add(message);
         }
-      } else if (message is List && message.isNotEmpty &&
-                 message.first is Map) {
+      } else if (message is List &&
+          message.isNotEmpty &&
+          message.first is Map) {
         if (message.first.containsKey('result') ||
             message.first.containsKey('error')) {
           _clientIncomingForwarder.add(message);
