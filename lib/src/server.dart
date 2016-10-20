@@ -56,9 +56,8 @@ class Server {
   /// Note that the server won't begin listening to [requests] until
   /// [Server.listen] is called.
   Server(StreamChannel<String> channel)
-      : this.withoutJson(channel
-            .transform(jsonDocument)
-            .transform(respondToFormatExceptions));
+      : this.withoutJson(
+            jsonDocument.bind(channel).transform(respondToFormatExceptions));
 
   /// Creates a [Server] that communicates using decoded messages over
   /// [channel].
