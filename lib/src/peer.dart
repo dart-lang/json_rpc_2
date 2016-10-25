@@ -92,9 +92,8 @@ class Peer implements Client, Server {
         } else {
           _serverIncomingForwarder.add(message);
         }
-      } else if (message is List &&
-          message.isNotEmpty &&
-          message.first is Map) {
+      } else if (message is List && message.isNotEmpty &&
+                 message.first is Map) {
         if (message.first.containsKey('result') ||
             message.first.containsKey('error')) {
           _clientIncomingForwarder.add(message);

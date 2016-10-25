@@ -173,7 +173,7 @@ class Client {
     if (response.containsKey("result")) {
       request.completer.complete(response["result"]);
     } else {
-      request.completer.completeError( new RpcException(
+      request.completer.completeError(new RpcException(
             response["error"]["code"],
             response["error"]["message"],
             data: response["error"]["data"]),
