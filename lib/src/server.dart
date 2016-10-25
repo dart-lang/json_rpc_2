@@ -159,7 +159,7 @@ class Server {
           throw new RpcException.invalidParams('No parameters are allowed for '
               'method "$name".');
         }
-        result = method();
+        result = await method();
       } else {
         result = await method(new Parameters(name, request['params']));
       }
