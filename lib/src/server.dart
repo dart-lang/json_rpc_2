@@ -145,28 +145,32 @@ class Server {
   }
 
   /// Handles an individual parsed request.
-  Future _handleSingleRequest(request) {
-    return new Future.sync(() {
+  Future _handleSingleRequest(request) async {
+    try {
       _validateRequest(request);
 
       var name = request['method'];
       var method = _methods[name];
       if (method == null) method = _tryFallbacks;
 
+      Object result;
       if (method is ZeroArgumentFunction) {
-        if (!request.containsKey('params')) return method();
-        throw new RpcException.invalidParams('No parameters are allowed for '
-            'method "$name".');
+        if (request.containsKey('params')) {
+          throw new RpcException.invalidParams('No parameters are allowed for '
+              'method "$name".');
+        }
+        result = method();
+      } else {
+        result = await method(new Parameters(name, request['params']));
       }
 
-      return method(new Parameters(name, request['params']));
-    }).then((result) {
       // A request without an id is a notification, which should not be sent a
       // response, even if one is generated on the server.
       if (!request.containsKey('id')) return null;
 
       return {'jsonrpc': '2.0', 'result': result, 'id': request['id']};
-    }).catchError((error, stackTrace) {
+    } catch (e, stackTrace) {
+      var error = e;
       if (error is! RpcException) {
         error = new RpcException(
             error_code.SERVER_ERROR, getErrorMessage(error), data: {
@@ -181,7 +185,7 @@ class Server {
       } else {
         return error.serialize(request);
       }
-    });
+    }
   }
 
   /// Validates that [request] matches the JSON-RPC spec.
@@ -243,18 +247,18 @@ class Server {
   Future _tryFallbacks(Parameters params) {
     var iterator = _fallbacks.toList().iterator;
 
-    _tryNext() {
+    _tryNext() async {
       if (!iterator.moveNext()) {
-        return new Future.error(new RpcException.methodNotFound(params.method),
-            new Chain.current());
+        throw new RpcException.methodNotFound(params.method);
       }
 
-      return new Future.sync(() => iterator.current(params))
-          .catchError((error) {
+      try {
+        return iterator.current(params);
+      } on RpcException catch (error) {
         if (error is! RpcException) throw error;
         if (error.code != error_code.METHOD_NOT_FOUND) throw error;
         return _tryNext();
-      });
+      }
     }
 
     return _tryNext();
