@@ -173,20 +173,22 @@ class Server {
         'result': result,
         'id': request['id']
       };
-    } catch (error, stackTrace) {
+    } catch (e, stackTrace) {
+      var error = e;
+      if (error is! RpcException) {
+        error = new RpcException(
+            error_code.SERVER_ERROR, getErrorMessage(error), data: {
+          'full': error.toString(),
+          'stack': new Chain.forTrace(stackTrace).toString()
+        });
+      }
+
       if (error.code != error_code.INVALID_REQUEST &&
           !request.containsKey('id')) {
         return null;
+      } else {
+        return error.serialize(request);
       }
-
-      var e = error is RpcException
-          ? error
-          : new RpcException(error_code.SERVER_ERROR, getErrorMessage(error),
-              data: {
-                  'full': error.toString(),
-                  'stack': new Chain.forTrace(stackTrace).toString()
-                });
-      return e.serialize(request);
     }
   }
 
