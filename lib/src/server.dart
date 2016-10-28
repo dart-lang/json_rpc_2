@@ -181,19 +181,15 @@ class Server {
         } else {
           return null;
         }
-      } else {
-        if (request.containsKey('id')) {
-          final chain = new Chain.forTrace(stackTrace);
-          return new RpcException(
-              error_code.SERVER_ERROR, getErrorMessage(error),
-              data: {
-                'full': '$error',
-                'stack': '$chain',
-              }).serialize(request);
-        } else {
-          return null;
-        }
+      } else if (!request.containsKey('id')) {
+        return null;
       }
+      final chain = new Chain.forTrace(stackTrace);
+      return new RpcException(error_code.SERVER_ERROR, getErrorMessage(error),
+          data: {
+            'full': '$error',
+            'stack': '$chain',
+          }).serialize(request);
     }
   }
 
