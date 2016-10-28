@@ -173,7 +173,7 @@ class Server {
         'result': result,
         'id': request['id']
       };
-    } catch (e, stackTrace) {
+    } catch (error, stackTrace) {
       if (error is RpcException) {
         if (error.code == error_code.INVALID_REQUEST ||
             request.containsKey('id')) {
