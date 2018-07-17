@@ -9,8 +9,8 @@ environment:
   sdk: '>=2.0.0-dev.17.0 <3.0.0'
 
 dependencies:
-  stack_trace: ^1.9.2
-  stream_channel: ^1.6.7
+  stack_trace: '>=0.9.1 <2.0.0'
+  stream_channel: '>=1.1.0 <2.0.0'
 
 dev_dependencies:
   test: ^1.2.0
