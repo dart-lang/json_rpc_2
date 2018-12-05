@@ -93,6 +93,48 @@ class _RespondToFormatExceptionsTransformer
   }
 }
 
+/// Splits a string of concatenated, encoded JSON objects into a List of
+/// encoded JSON objects
+List<String> _splitJson(json) {
+  final events = List<String>();
+  var braceCount = 0;
+  var inString = false;
+  var startPos = 0;
+  for (var i = 0; i < json.length; i++) {
+    final c = json[i];
+    if (c == '"') {
+      inString = !inString;
+    } else if (inString) {
+      continue;
+    } else if (c == "{") {
+      braceCount += 1;
+    } else if (c == "}") {
+      braceCount -= 1;
+    }
+    if (braceCount == 0) {
+      events.add(json.substring(startPos, (i + 1)));
+      startPos = i + 1;
+    }
+  }
+  return events;
+}
+
+/// A transformer that splits concatenated JSON objects into a stream of
+/// individual JSON objects
+final StreamChannelTransformer splitJsonObjects =
+    new _SplitJsonObjectsTransformer();
+
+/// The implementation of [splitJsonObjects].
+/// Expects the binding Stream to contain exactly 0 or more whole Json objects,
+/// i.e. no partial objects
+class _SplitJsonObjectsTransformer
+    implements StreamChannelTransformer<String, String> {
+  bind(channel) {
+    return channel
+        .changeStream((stream) => stream.expand((event) => _splitJson(event)));
+  }
+}
+
 /// Returns a [StreamSink] that wraps [sink] and maps each event added using
 /// [callback].
 StreamSink mapStreamSink(StreamSink sink, callback(event)) =>
