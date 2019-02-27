@@ -175,10 +175,10 @@ class Server {
             request.containsKey('id')) {
           return error.serialize(request);
         } else {
-          return null;
+          rethrow;
         }
       } else if (!request.containsKey('id')) {
-        return null;
+        rethrow;
       }
       final chain = new Chain.forTrace(stackTrace);
       return new RpcException(error_code.SERVER_ERROR, getErrorMessage(error),
