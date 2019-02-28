@@ -15,6 +15,9 @@ import 'exception.dart';
 import 'parameters.dart';
 import 'utils.dart';
 
+/// A callback for unhandled exceptions.
+typedef ErrorCallback = void Function(dynamic error, dynamic stackTrace);
+
 /// A JSON-RPC 2.0 server.
 ///
 /// A server exposes methods that are called by requests, to which it provides
@@ -51,13 +54,16 @@ class Server {
   /// endpoint closes the connection.
   bool get isClosed => _manager.isClosed;
 
+  final ErrorCallback onUnhandledError;
+
   /// Creates a [Server] that communicates over [channel].
   ///
   /// Note that the server won't begin listening to [requests] until
   /// [Server.listen] is called.
-  Server(StreamChannel<String> channel)
+  Server(StreamChannel<String> channel, {ErrorCallback onUnhandledError})
       : this.withoutJson(
-            jsonDocument.bind(channel).transform(respondToFormatExceptions));
+            jsonDocument.bind(channel).transform(respondToFormatExceptions),
+            onUnhandledError: onUnhandledError);
 
   /// Creates a [Server] that communicates using decoded messages over
   /// [channel].
@@ -67,7 +73,7 @@ class Server {
   ///
   /// Note that the server won't begin listening to [requests] until
   /// [Server.listen] is called.
-  Server.withoutJson(StreamChannel channel)
+  Server.withoutJson(StreamChannel channel, {this.onUnhandledError})
       : _manager = new ChannelManager("Server", channel);
 
   /// Starts listening to the underlying stream.
@@ -175,10 +181,12 @@ class Server {
             request.containsKey('id')) {
           return error.serialize(request);
         } else {
-          rethrow;
+          onUnhandledError?.call(error, stackTrace);
+          return null;
         }
       } else if (!request.containsKey('id')) {
-        rethrow;
+        onUnhandledError?.call(error, stackTrace);
+        return null;
       }
       final chain = new Chain.forTrace(stackTrace);
       return new RpcException(error_code.SERVER_ERROR, getErrorMessage(error),

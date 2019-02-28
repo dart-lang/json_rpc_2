@@ -1,3 +1,8 @@
+## 2.0.10
+
+* `Server` and related classes canq now take an `onUnhandledError` callback to
+  notify callers of unhandled exceptions.
+
 ## 2.0.8
 
 * Updated SDK version to 2.0.0-dev.17.0

@@ -184,4 +184,24 @@ void main() {
       incoming.add({"completely": "wrong"});
     });
   });
+
+  test("can notify on unhandled errors for if the method throws", () async {
+    var incomingController = new StreamController();
+    var outgoingController = new StreamController();
+    final Completer<bool> completer = Completer<bool>();
+    peer = new json_rpc.Peer.withoutJson(
+        new StreamChannel(incomingController.stream, outgoingController),
+        onUnhandledError: (error, stack) {
+      completer.complete(true);
+    });
+    peer
+      ..registerMethod('foo', () {
+        throw Exception();
+      })
+      ..listen();
+
+    incomingController.add({'jsonrpc': '2.0', 'method': 'foo'});
+    bool gotError = await completer.future;
+    expect(gotError, true);
+  });
 }
