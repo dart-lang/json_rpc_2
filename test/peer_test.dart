@@ -191,10 +191,11 @@ void main() {
     var outgoingController = new StreamController();
     final Completer<Exception> completer = Completer<Exception>();
     peer = new json_rpc.Peer.withoutJson(
-        new StreamChannel(incomingController.stream, outgoingController),
-        onUnhandledError: (error, stack) {
-      completer.complete(error);
-    });
+      new StreamChannel(incomingController.stream, outgoingController),
+      onUnhandledError: (error, stack) {
+        completer.complete(error);
+      },
+    );
     peer
       ..registerMethod('foo', () => throw exception)
       ..listen();
