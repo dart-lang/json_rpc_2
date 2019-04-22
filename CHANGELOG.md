@@ -1,4 +1,4 @@
-## 2.0.11
+## 2.1.0
 
 * `Server` and related classes can now take an `onUnhandledError` callback to
   notify callers of unhandled exceptions.

@@ -46,6 +46,9 @@ class Peer implements Client, Server {
   ///
   /// Note that the peer won't begin listening to [channel] until [Peer.listen]
   /// is called.
+  ///
+  /// Unhandled exceptions in callbacks will be forwarded to [onUnhandledError].
+  /// If this is not provided, unhandled exceptions will be swallowed.
   Peer(StreamChannel<String> channel, {ErrorCallback onUnhandledError})
       : this.withoutJson(
             jsonDocument.bind(channel).transform(respondToFormatExceptions),
@@ -58,6 +61,9 @@ class Peer implements Client, Server {
   ///
   /// Note that the peer won't begin listening to [channel] until
   /// [Peer.listen] is called.
+  ///
+  /// Unhandled exceptions in callbacks will be forwarded to [onUnhandledError].
+  /// If this is not provided, unhandled exceptions will be swallowed.
   Peer.withoutJson(StreamChannel channel, {ErrorCallback onUnhandledError})
       : _manager = new ChannelManager("Peer", channel) {
     _server = new Server.withoutJson(

@@ -54,12 +54,20 @@ class Server {
   /// endpoint closes the connection.
   bool get isClosed => _manager.isClosed;
 
+  /// A callback that is fired on unhandled exceptions.
+  ///
+  /// In the case where a user provided callback results in an exception that
+  /// cannot be properly routed back to the client, this handler will be
+  /// invoked. If it is not set, the exception will be swallowed.
   final ErrorCallback onUnhandledError;
 
   /// Creates a [Server] that communicates over [channel].
   ///
   /// Note that the server won't begin listening to [requests] until
   /// [Server.listen] is called.
+  ///
+  /// Unhandled exceptions in callbacks will be forwarded to [onUnhandledError].
+  /// If this is not provided, unhandled exceptions will be swallowed.
   Server(StreamChannel<String> channel, {ErrorCallback onUnhandledError})
       : this.withoutJson(
             jsonDocument.bind(channel).transform(respondToFormatExceptions),
@@ -73,6 +81,9 @@ class Server {
   ///
   /// Note that the server won't begin listening to [requests] until
   /// [Server.listen] is called.
+  ///
+  /// Unhandled exceptions in callbacks will be forwarded to [onUnhandledError].
+  /// If this is not provided, unhandled exceptions will be swallowed.
   Server.withoutJson(StreamChannel channel, {this.onUnhandledError})
       : _manager = new ChannelManager("Server", channel);
 
