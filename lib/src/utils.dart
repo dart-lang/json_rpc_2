@@ -94,13 +94,20 @@ class _RespondToFormatExceptionsTransformer
 }
 
 /// Splits a string of concatenated, encoded JSON objects into a List of
-/// encoded JSON objects
+/// encoded JSON objects. Also handles a single JSON object split over
+/// multiple packets.
+var cachedJson = '';
+var braceCount = 0;
+var inString = false;
 List<String> _splitJson(json) {
+  var startPos = cachedJson.length;
+  json = cachedJson + json;
+  cachedJson = '';
+
   final events = List<String>();
-  var braceCount = 0;
-  var inString = false;
-  var startPos = 0;
-  for (var i = 0; i < json.length; i++) {
+  var i = startPos;
+  startPos = 0;
+  for (; i < json.length; i++) {
     final c = json[i];
     if (c == '"') {
       inString = !inString;
@@ -115,6 +122,9 @@ List<String> _splitJson(json) {
       events.add(json.substring(startPos, (i + 1)));
       startPos = i + 1;
     }
+  }
+  if (braceCount > 0) {
+    cachedJson = json.substring(startPos);
   }
   return events;
 }
