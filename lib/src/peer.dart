@@ -39,15 +39,23 @@ class Peer implements Client, Server {
   Future get done => _manager.done;
   bool get isClosed => _manager.isClosed;
 
+  @override
+  ErrorCallback get onUnhandledError => _server?.onUnhandledError;
+
   /// Creates a [Peer] that communicates over [channel].
   ///
   /// Note that the peer won't begin listening to [channel] until [Peer.listen]
   /// is called.
-  Peer(StreamChannel<String> channel)
-      : this.withoutJson(channel
-            .transform(splitJsonObjects)
-            .transform(jsonDocument)
-            .transform(respondToFormatExceptions));
+  ///
+  /// Unhandled exceptions in callbacks will be forwarded to [onUnhandledError].
+  /// If this is not provided, unhandled exceptions will be swallowed.
+  Peer(StreamChannel<String> channel, {ErrorCallback onUnhandledError})
+      : this.withoutJson(
+            channel
+                .transform(splitJsonObjects)
+                .transform(jsonDocument)
+                .transform(respondToFormatExceptions),
+            onUnhandledError: onUnhandledError);
 
   /// Creates a [Peer] that communicates using decoded messages over [channel].
   ///
@@ -56,10 +64,14 @@ class Peer implements Client, Server {
   ///
   /// Note that the peer won't begin listening to [channel] until
   /// [Peer.listen] is called.
-  Peer.withoutJson(StreamChannel channel)
+  ///
+  /// Unhandled exceptions in callbacks will be forwarded to [onUnhandledError].
+  /// If this is not provided, unhandled exceptions will be swallowed.
+  Peer.withoutJson(StreamChannel channel, {ErrorCallback onUnhandledError})
       : _manager = new ChannelManager("Peer", channel) {
     _server = new Server.withoutJson(
-        new StreamChannel(_serverIncomingForwarder.stream, channel.sink));
+        new StreamChannel(_serverIncomingForwarder.stream, channel.sink),
+        onUnhandledError: onUnhandledError);
     _client = new Client.withoutJson(
         new StreamChannel(_clientIncomingForwarder.stream, channel.sink));
   }
