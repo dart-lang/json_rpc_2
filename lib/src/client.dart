@@ -189,8 +189,7 @@ class Client {
       request.completer.complete(response['result']);
     } else {
       request.completer.completeError(
-          RpcException(
-              response['error']['code'], response['error']['message'],
+          RpcException(response['error']['code'], response['error']['message'],
               data: response['error']['data']),
           request.chain);
     }

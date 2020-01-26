@@ -64,9 +64,8 @@ void tryFinally(Function() body, Function() whenComplete) {
 }
 
 /// A transformer that silently drops [FormatException]s.
-final ignoreFormatExceptions =
-    StreamTransformer<Object, Object>.fromHandlers(
-        handleError: (error, stackTrace, sink) {
+final ignoreFormatExceptions = StreamTransformer<Object, Object>.fromHandlers(
+    handleError: (error, stackTrace, sink) {
   if (error is FormatException) return;
   sink.addError(error, stackTrace);
 });
