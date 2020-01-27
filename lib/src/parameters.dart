@@ -261,6 +261,17 @@ class Parameter extends Parameters {
   /// If [value] doesn't exist, this returns [defaultValue].
   Uri asUriOr(Uri defaultValue) => asUri;
 
+  /// Get a parameter named [named] that matches [test], or the value of calling
+  /// [orElse].
+  ///
+  /// [type] is used for the error message. It should begin with an indefinite
+  /// article.
+  dynamic _getTyped(String type, bool Function(dynamic) test) {
+    if (test(value)) return value;
+    throw RpcException.invalidParams('Parameter $_path for method '
+        '"$method" must be $type, but was ${jsonEncode(value)}.');
+  }
+
   dynamic _getParsed(String description, Function(String) parse) {
     var string = asString;
     try {
@@ -280,17 +291,6 @@ class Parameter extends Parameters {
           '"$method" must be a valid $description, but was '
           '${jsonEncode(string)}.$message');
     }
-  }
-
-  /// Get a parameter named [named] that matches [test], or the value of calling
-  /// [orElse].
-  ///
-  /// [type] is used for the error message. It should begin with an indefinite
-  /// article.
-  dynamic _getTyped(String type, bool Function(dynamic) test) {
-    if (test(value)) return value;
-    throw RpcException.invalidParams('Parameter $_path for method '
-        '"$method" must be $type, but was ${jsonEncode(value)}.');
   }
 
   @override
