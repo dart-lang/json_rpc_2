@@ -197,7 +197,7 @@ void main() {
       },
     );
     peer
-      ..registerMethod('foo', () => throw exception)
+      ..registerMethod('foo', (_) => throw exception)
       ..listen();
 
     incomingController.add({'jsonrpc': '2.0', 'method': 'foo'});
