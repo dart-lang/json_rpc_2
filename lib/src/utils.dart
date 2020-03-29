@@ -8,10 +8,8 @@ import 'package:stream_channel/stream_channel.dart';
 
 import '../error_code.dart' as error_code;
 import 'exception.dart';
-import 'parameters.dart';
 
 typedef ZeroArgumentFunction = FutureOr Function();
-typedef ArgumentFunction = FutureOr Function(Parameters parameters);
 
 /// Returns a sentence fragment listing the elements of [iter].
 ///
