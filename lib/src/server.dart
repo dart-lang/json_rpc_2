@@ -110,7 +110,8 @@ class Server {
   /// [callback] can return either a JSON-serializable object or a Future that
   /// completes to a JSON-serializable object. Any errors in [callback] will be
   /// reported to the client as JSON-RPC 2.0 errors.
-  void registerMethod(String name, FutureOr Function(Parameters) callback) {
+  void registerMethod(
+      String name, FutureOr Function(Parameters parameters) callback) {
     if (_methods.containsKey(name)) {
       throw ArgumentError('There\'s already a method named "$name".');
     }
