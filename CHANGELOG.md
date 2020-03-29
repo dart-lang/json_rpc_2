@@ -1,3 +1,7 @@
+## 2.1.0+1
+
+* Specify type on `registerMethod` and `registerFallback`.
+
 ## 2.1.0
 
 * `Server` and related classes can now take an `onUnhandledError` callback to

@@ -91,11 +91,11 @@ class Peer implements Client, Server {
   // Server methods.
 
   @override
-  void registerMethod(String name, Function callback) =>
+  void registerMethod(String name, FutureOr Function(Parameters) callback) =>
       _server.registerMethod(name, callback);
 
   @override
-  void registerFallback(Function(Parameters parameters) callback) =>
+  void registerFallback(FutureOr Function(Parameters parameters) callback) =>
       _server.registerFallback(callback);
 
   // Shared methods.
