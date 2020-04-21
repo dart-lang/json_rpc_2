@@ -1,4 +1,4 @@
-## Unreleased
+## 2.1.1
 
 * Fixed issue where throwing `RpcException.methodNotFound` in an asynchronous
   fallback handler would not result in the next fallback being executed.
