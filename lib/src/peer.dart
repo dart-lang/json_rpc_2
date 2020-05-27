@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:pedantic/pedantic.dart';
 import 'package:stream_channel/stream_channel.dart';
 
 import 'channel_manager.dart';
@@ -118,10 +119,10 @@ class Peer implements Client, Server {
   // Shared methods.
 
   @override
-  Future listen() {
-    _client.listen();
-    _server.listen();
-    return _manager.listen((message) {
+  Future listen() async {
+    unawaited(_client.listen());
+    unawaited(_server.listen());
+    await _manager.listen((message) {
       if (message is Map) {
         if (message.containsKey('result') || message.containsKey('error')) {
           _clientIncomingForwarder.add(message);
@@ -143,6 +144,8 @@ class Peer implements Client, Server {
         _serverIncomingForwarder.add(message);
       }
     });
+
+    return close();
   }
 
   @override
