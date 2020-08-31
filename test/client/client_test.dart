@@ -41,7 +41,11 @@ void main() {
             containsPair('params', {'param': 'value'})
           ]));
 
-      return {'jsonrpc': '2.0', 'result': 'bar', 'id': request['id'].toString()};
+      return {
+        'jsonrpc': '2.0',
+        'result': 'bar',
+        'id': request['id'].toString()
+      };
     });
 
     expect(controller.client.sendRequest('foo', {'param': 'value'}),
