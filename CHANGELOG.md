@@ -1,3 +1,8 @@
+## 2.2.3-dev (unreleased)
+
+* Fix issue where response was ignored when server returned a `String`
+  message id.
+
 ## 2.2.2
 
 * Fix `Peer.close()` throwing `Bad state: Future already completed`.
