@@ -1,7 +1,6 @@
 ## 2.2.3-dev (unreleased)
 
-* Fix issue where response was ignored when server returned a `String`
-  message id.
+* Accept responses even if the server converts the ID to a String.
 
 ## 2.2.2
 
