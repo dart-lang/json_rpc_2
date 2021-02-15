@@ -177,6 +177,7 @@ void main() {
     expect(controller.client.sendRequest('foo', {'param': 'value'}),
         throwsA(predicate((exception) {
       expect(exception, TypeMatcher<json_rpc.RpcException>());
+      exception as json_rpc.RpcException;
       expect(exception.code, equals(error_code.SERVER_ERROR));
       expect(exception.message, equals('you are bad at requests'));
       expect(exception.data, equals('some junk'));
