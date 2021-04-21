@@ -178,7 +178,7 @@ void main() {
         controller.client.sendRequest('foo', {'param': 'value'}),
         throwsA(TypeMatcher<json_rpc.RpcException>()
             .having((e) => e.code, 'code', error_code.SERVER_ERROR)
-            .having((e) => e.message, 'message', 'you are bat at requests')
+            .having((e) => e.message, 'message', 'you are bad at requests')
             .having((e) => e.data, 'data', 'some junk')));
   });
 
