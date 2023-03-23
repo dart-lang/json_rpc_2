@@ -94,7 +94,7 @@ class Peer implements Client, Server {
   // Client methods.
 
   @override
-  Future sendRequest(String method, [parameters]) =>
+  Future sendRequest(String method, [parameters, int? id]) =>
       _client.sendRequest(method, parameters);
 
   @override
