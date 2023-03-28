@@ -43,7 +43,7 @@ class Parameters {
   /// doesn't exist. On the other hand, if it's accessed through a method with a
   /// default value like [Parameter.valueOr] or [Parameter.asNumOr], the default
   /// value will be returned.
-  Parameter operator [](Object? key) {
+  Parameter operator [](Object key) {
     if (key is int) {
       _assertPositional();
       if (key < value.length) {
