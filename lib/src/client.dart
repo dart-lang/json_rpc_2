@@ -113,8 +113,8 @@ class Client {
   ///
   /// Throws a [StateError] if the client is closed while the request is in
   /// flight, or if the client is closed when this method is called.
-  Future sendRequest(String method, [Object? parameters]) {
-    var id = _id++;
+  Future sendRequest(String method, [Object? parameters, int? id]) {
+    id ??= _id++;
     _send(method, parameters, id);
 
     var completer = Completer.sync();
