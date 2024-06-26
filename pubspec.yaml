@@ -5,7 +5,7 @@ description: >-
 repository: https://github.com/dart-lang/json_rpc_2
 
 environment:
-  sdk: ^3.3.0
+  sdk: ^3.4.0
 
 dependencies:
   stack_trace: ^1.10.0
