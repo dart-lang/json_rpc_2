@@ -1,3 +1,6 @@
+> [!IMPORTANT]  
+> This repo has moved to https://github.com/dart-lang/tools/tree/main/pkgs/json_rpc_2
+
 [![Dart CI](https://github.com/dart-lang/json_rpc_2/actions/workflows/test-package.yml/badge.svg)](https://github.com/dart-lang/json_rpc_2/actions/workflows/test-package.yml)
 [![pub package](https://img.shields.io/pub/v/json_rpc_2.svg)](https://pub.dev/packages/json_rpc_2)
 [![package publisher](https://img.shields.io/pub/publisher/json_rpc_2.svg)](https://pub.dev/packages/json_rpc_2/publisher)
